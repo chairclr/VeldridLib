@@ -28,7 +28,7 @@ internal class VulkanDeviceHelper
     private readonly static FieldInfo _submittedStagingBuffersField = typeof(Veldrid.Vk.VkGraphicsDevice).GetField("_submittedStagingBuffers", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)!;
     private readonly static FieldInfo _submittedSharedCommandPoolsField = typeof(Veldrid.Vk.VkGraphicsDevice).GetField("_submittedSharedCommandPools", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)!;
 
-    public unsafe static Veldrid.Vk.VkGraphicsDevice MakeDevice(VeldridLib.FNAReflector.FNA3DDevice* fnaDevice)
+    public unsafe static Veldrid.Vk.VkGraphicsDevice MakeDevice(FNAReflector.FNA3DDevice* fnaDevice)
     {
         VulkanRenderer* vkr = (VulkanRenderer*)fnaDevice->driverData;
 
@@ -115,6 +115,8 @@ internal class VulkanDeviceHelper
 
         vkDevice.PostDeviceCreated();
 
+        // TODO: Steal swapchain and backbuffer from FNA3D
+        
         return vkDevice;
     }
 
@@ -154,7 +156,7 @@ internal class VulkanDeviceHelper
     [StructLayout(LayoutKind.Sequential)]
     private unsafe struct VulkanRenderer
     {
-        public VeldridLib.FNAReflector.FNA3DDevice* parentDevice;
+        public FNAReflector.FNA3DDevice* parentDevice;
         public nint* allocator;
         public VkInstance instance;
         public VkPhysicalDevice physicalDevice;
