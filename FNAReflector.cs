@@ -36,6 +36,7 @@ internal class FNAReflector
         {
             Veldrid.GraphicsBackend.Vulkan => VeldridGraphicsDevice = VulkanDeviceHelper.MakeDevice(fnaDevice),
             Veldrid.GraphicsBackend.OpenGL => VeldridGraphicsDevice = OepnGLDeviceHelper.MakeDevice(fnaDevice),
+            Veldrid.GraphicsBackend.Direct3D11 => VeldridGraphicsDevice = D3D11DeviceHelper.MakeDevice(fnaDevice),
             _ => throw new Exception($"Unsupported FNA3D Driver '{backend}'"),
         };
     }
