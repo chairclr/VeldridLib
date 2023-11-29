@@ -1,0 +1,5 @@
+displayName = VeldridLib
+author = chair
+version = 0.1
+
+dllReferences = Microsoft.DotNet.PlatformAbstractions, Microsoft.Extensions.DependencyModel, NativeLibraryLoader, Newtonsoft.Json, SharpGen.Runtime.COM, SharpGen.Runtime, Veldrid, Veldrid.MetalBindings, Veldrid.OpenGLBindings, vk, Vortice.D3DCompiler, Vortice.Direct3D11, Vortice.DirectX, Vortice.DXGI, Vortice.Mathematics
