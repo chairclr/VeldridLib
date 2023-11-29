@@ -1,9 +1,8 @@
 using Terraria.ModLoader;
 
-namespace VeldridLib
+namespace VeldridLib;
+
+public class VeldridLib : Mod
 {
-	public class VeldridLib : Mod
-	{
-		
-	}
+
 }

@@ -8,6 +8,8 @@ using Vulkan;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
 
+namespace VeldridLib;
+
 internal class VulkanDeviceHelper
 {
     private readonly static FieldInfo ResourceField = typeof(Veldrid.Vk.VkGraphicsDevice).GetField("<ResourceFactory>k__BackingField", BindingFlags.Instance | BindingFlags.NonPublic)!;

@@ -14,7 +14,7 @@
             "stopAtEntry": true,
             "justMyCode": true,
             "env": {
-                "FNA3D_FORCE_DRIVER": "Vulkan"
+                "FNA3D_FORCE_DRIVER": "OpenGL"
              }
         },
         {
