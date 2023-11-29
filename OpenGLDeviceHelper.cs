@@ -6,14 +6,14 @@ using Veldrid;
 
 namespace VeldridLib;
 
-internal class OepngLDeviceHelper
+internal class OepnGLDeviceHelper
 {
     public unsafe static Veldrid.OpenGL.OpenGLGraphicsDevice MakeDevice(FNAReflector.FNA3DDevice* fnaDevice)
     {
         OpenGLRenderer* oglr = (OpenGLRenderer*)fnaDevice->driverData;
 
-        // TODO: Don't make this so hacky
         nint sdlHandle = Main.instance.Window.Handle;
+        nint context = oglr->context;
 
         OpenGLPlatformInfo platformInfo = new OpenGLPlatformInfo(
             oglr->context,
@@ -33,7 +33,7 @@ internal class OepngLDeviceHelper
         glDevice._swapchainFramebuffer.Dispose();
         glDevice._mainSwapchain = null;
         glDevice._swapchainFramebuffer = null;
-        SDL2.SDL.SDL_GL_MakeCurrent(sdlHandle, oglr->context);
+        //SDL2.SDL.SDL_GL_MakeCurrent(sdlHandle, context);
 
         return glDevice;
     }
