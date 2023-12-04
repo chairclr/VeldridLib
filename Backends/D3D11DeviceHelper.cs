@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 using System.Threading;
@@ -15,32 +16,32 @@ namespace VeldridLib.Backends;
 
 internal unsafe class D3D11DeviceHelper
 {
-    const BindingFlags finstance = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
-    const BindingFlags fany = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static;
-    private static readonly FieldInfo _immediateContextLockField = typeof(D3D11GraphicsDevice).GetField("_immediateContextLock", finstance)!;
-    private static readonly FieldInfo _mappedResourceLockField = typeof(D3D11GraphicsDevice).GetField("_mappedResourceLock", finstance)!;
-    private static readonly FieldInfo _mappedResourcesField = typeof(D3D11GraphicsDevice).GetField("_mappedResources", finstance)!;
-    private static readonly FieldInfo _stagingResourcesLockField = typeof(D3D11GraphicsDevice).GetField("_stagingResourcesLock", finstance)!;
-    private static readonly FieldInfo _availableStagingBuffersField = typeof(D3D11GraphicsDevice).GetField("_availableStagingBuffers", finstance)!;
-    private static readonly FieldInfo _resetEventsLockField = typeof(D3D11GraphicsDevice).GetField("_resetEventsLock", finstance)!;
-    private static readonly FieldInfo _resetEventField = typeof(D3D11GraphicsDevice).GetField("_resetEvents", finstance)!;
-    private static readonly FieldInfo _deviceField = typeof(D3D11GraphicsDevice).GetField("_device", finstance)!;
-    private static readonly FieldInfo _dxgiAdapterField = typeof(D3D11GraphicsDevice).GetField("_dxgiAdapter", finstance)!;
-    private static readonly FieldInfo _deviceNameField = typeof(D3D11GraphicsDevice).GetField("_deviceName", finstance)!;
-    private static readonly FieldInfo _vendorNameField = typeof(D3D11GraphicsDevice).GetField("_vendorName", finstance)!;
-    private static readonly FieldInfo _deviceIdField = typeof(D3D11GraphicsDevice).GetField("_deviceId", finstance)!;
-    private static readonly FieldInfo _apiVersionField = typeof(D3D11GraphicsDevice).GetField("_apiVersion", finstance)!;
-    private static readonly FieldInfo _immediateContextField = typeof(D3D11GraphicsDevice).GetField("_immediateContext", finstance)!;
-    private static readonly FieldInfo _featuresField = typeof(D3D11GraphicsDevice).GetField("<Features>k__BackingField", finstance)!;
-    private static readonly FieldInfo _isDebugEnabledField = typeof(D3D11GraphicsDevice).GetField("<IsDebugEnabled>k__BackingField", finstance)!;
-    private static readonly FieldInfo _supportsConcurrentResourcesField = typeof(D3D11GraphicsDevice).GetField("_supportsConcurrentResources", finstance)!;
-    private static readonly FieldInfo _supportsCommandListsField = typeof(D3D11GraphicsDevice).GetField("_supportsCommandLists", finstance)!;
-    private static readonly FieldInfo _d3d11ResourceFactoryField = typeof(D3D11GraphicsDevice).GetField("_d3d11ResourceFactory", finstance)!;
-    private static readonly FieldInfo _d3d11Info = typeof(D3D11GraphicsDevice).GetField("_d3d11Info", finstance)!;
+    private const BindingFlags InstanceFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
 
-    public static D3D11GraphicsDevice MakeDevice(FNAReflector.FNA3DDevice* fnadevice)
+    private static readonly FieldInfo _immediateContextLockField = typeof(D3D11GraphicsDevice).GetField("_immediateContextLock", InstanceFlags)!;
+    private static readonly FieldInfo _mappedResourceLockField = typeof(D3D11GraphicsDevice).GetField("_mappedResourceLock", InstanceFlags)!;
+    private static readonly FieldInfo _mappedResourcesField = typeof(D3D11GraphicsDevice).GetField("_mappedResources", InstanceFlags)!;
+    private static readonly FieldInfo _stagingResourcesLockField = typeof(D3D11GraphicsDevice).GetField("_stagingResourcesLock", InstanceFlags)!;
+    private static readonly FieldInfo _availableStagingBuffersField = typeof(D3D11GraphicsDevice).GetField("_availableStagingBuffers", InstanceFlags)!;
+    private static readonly FieldInfo _resetEventsLockField = typeof(D3D11GraphicsDevice).GetField("_resetEventsLock", InstanceFlags)!;
+    private static readonly FieldInfo _resetEventField = typeof(D3D11GraphicsDevice).GetField("_resetEvents", InstanceFlags)!;
+    private static readonly FieldInfo _deviceField = typeof(D3D11GraphicsDevice).GetField("_device", InstanceFlags)!;
+    private static readonly FieldInfo _dxgiAdapterField = typeof(D3D11GraphicsDevice).GetField("_dxgiAdapter", InstanceFlags)!;
+    private static readonly FieldInfo _deviceNameField = typeof(D3D11GraphicsDevice).GetField("_deviceName", InstanceFlags)!;
+    private static readonly FieldInfo _vendorNameField = typeof(D3D11GraphicsDevice).GetField("_vendorName", InstanceFlags)!;
+    private static readonly FieldInfo _deviceIdField = typeof(D3D11GraphicsDevice).GetField("_deviceId", InstanceFlags)!;
+    private static readonly FieldInfo _apiVersionField = typeof(D3D11GraphicsDevice).GetField("_apiVersion", InstanceFlags)!;
+    private static readonly FieldInfo _immediateContextField = typeof(D3D11GraphicsDevice).GetField("_immediateContext", InstanceFlags)!;
+    private static readonly FieldInfo _featuresField = typeof(D3D11GraphicsDevice).GetField("<Features>k__BackingField", InstanceFlags)!;
+    private static readonly FieldInfo _isDebugEnabledField = typeof(D3D11GraphicsDevice).GetField("<IsDebugEnabled>k__BackingField", InstanceFlags)!;
+    private static readonly FieldInfo _supportsConcurrentResourcesField = typeof(D3D11GraphicsDevice).GetField("_supportsConcurrentResources", InstanceFlags)!;
+    private static readonly FieldInfo _supportsCommandListsField = typeof(D3D11GraphicsDevice).GetField("_supportsCommandLists", InstanceFlags)!;
+    private static readonly FieldInfo _d3d11ResourceFactoryField = typeof(D3D11GraphicsDevice).GetField("_d3d11ResourceFactory", InstanceFlags)!;
+    private static readonly FieldInfo _d3d11Info = typeof(D3D11GraphicsDevice).GetField("_d3d11Info", InstanceFlags)!;
+
+    public static D3D11GraphicsDevice MakeDevice(ref FNAReflector.FNA3DDevice fnaDevice)
     {
-        FNAD3D11Renderer* renderer = (FNAD3D11Renderer*)fnadevice->driverData;
+        ref FNAD3D11Renderer renderer = ref Unsafe.As<byte, FNAD3D11Renderer>(ref Unsafe.AsRef<byte>((void*)fnaDevice.driverData));
 
         D3D11GraphicsDevice d3d11gd = (D3D11GraphicsDevice)FormatterServices.GetUninitializedObject(typeof(D3D11GraphicsDevice));
 
@@ -54,9 +55,9 @@ internal unsafe class D3D11DeviceHelper
         _resetEventsLockField.SetValue(d3d11gd, new object());
         _resetEventField.SetValue(d3d11gd, new List<ManualResetEvent[]>());
 
-        ID3D11Device device = new(renderer->device);
-        ID3D11DeviceContext context = new(renderer->context);
-        IDXGIAdapter adapter = new(renderer->adapter);
+        ID3D11Device device = new(renderer.device);
+        ID3D11DeviceContext context = new(renderer.context);
+        IDXGIAdapter adapter = new(renderer.adapter);
 
         _deviceField.SetValue(d3d11gd, device);
         _dxgiAdapterField.SetValue(d3d11gd, adapter);
@@ -77,7 +78,7 @@ internal unsafe class D3D11DeviceHelper
             FeatureLevel.Level_12_2 => new GraphicsApiVersion(12, 2, 0, 0),
             _ => default,
         };
-        
+
         _apiVersionField.SetValue(d3d11gd, _apiVersion);
         _immediateContextField.SetValue(d3d11gd, context);
 

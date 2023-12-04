@@ -28,9 +28,9 @@ internal class VulkanDeviceHelper
     private readonly static FieldInfo _submittedStagingBuffersField = typeof(Veldrid.Vk.VkGraphicsDevice).GetField("_submittedStagingBuffers", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)!;
     private readonly static FieldInfo _submittedSharedCommandPoolsField = typeof(Veldrid.Vk.VkGraphicsDevice).GetField("_submittedSharedCommandPools", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)!;
 
-    public unsafe static Veldrid.Vk.VkGraphicsDevice MakeDevice(FNAReflector.FNA3DDevice* fnaDevice)
+    public unsafe static Veldrid.Vk.VkGraphicsDevice MakeDevice(ref FNAReflector.FNA3DDevice fnaDevice)
     {
-        VulkanRenderer* vkr = (VulkanRenderer*)fnaDevice->driverData;
+        ref VulkanRenderer vkr = ref Unsafe.As<byte, VulkanRenderer>(ref Unsafe.AsRef<byte>((void*)fnaDevice.driverData));
 
         Veldrid.Vk.VkGraphicsDevice vkDevice = (Veldrid.Vk.VkGraphicsDevice)RuntimeHelpers.GetUninitializedObject(typeof(Veldrid.Vk.VkGraphicsDevice));
         FiltersField.SetValue(vkDevice, new ConcurrentDictionary<VkFormat, VkFilter>());
@@ -46,16 +46,23 @@ internal class VulkanDeviceHelper
         _submittedStagingBuffersField.SetValue(vkDevice, new Dictionary<VkCommandBuffer, Veldrid.Vk.VkBuffer>());
         _submittedSharedCommandPoolsField.SetValue(vkDevice, new Dictionary<VkCommandBuffer, Veldrid.Vk.VkGraphicsDevice.SharedCommandPool>());
 
-        vkDevice._instance = vkr->instance;
-        vkDevice._device = vkr->logicalDevice;
-        vkDevice._physicalDevice = vkr->physicalDevice;
-        vkDevice._deviceName = Encoding.UTF8.GetString(MemoryMarshal.CreateReadOnlySpanFromNullTerminated(vkr->physicalDeviceProperties.properties.deviceName));
-        vkDevice._vendorName = "id:" + vkr->physicalDeviceProperties.properties.vendorID.ToString("x8");
-        VkConformanceVersion conforming = vkr->physicalDeviceDriverProperties.conformanceVersion;
+        vkDevice._instance = vkr.instance;
+        vkDevice._device = vkr.logicalDevice;
+        vkDevice._physicalDevice = vkr.physicalDevice;
+
+        fixed (byte* p = vkr.physicalDeviceProperties.properties.deviceName)
+            vkDevice._deviceName = Encoding.UTF8.GetString(MemoryMarshal.CreateReadOnlySpanFromNullTerminated(p));
+            
+        vkDevice._vendorName = "id:" + vkr.physicalDeviceProperties.properties.vendorID.ToString("x8");
+        VkConformanceVersion conforming = vkr.physicalDeviceDriverProperties.conformanceVersion;
         vkDevice._apiVersion = new Veldrid.GraphicsApiVersion(conforming.major, conforming.minor, conforming.subminor, conforming.patch);
-        vkDevice._deviceName = Encoding.UTF8.GetString(MemoryMarshal.CreateReadOnlySpanFromNullTerminated(vkr->physicalDeviceDriverProperties.driverName));
-        vkDevice._driverInfo = Encoding.UTF8.GetString(MemoryMarshal.CreateReadOnlySpanFromNullTerminated(vkr->physicalDeviceDriverProperties.driverInfo));
-        vkDevice._physicalDeviceProperties = vkr->physicalDeviceProperties.properties;
+
+        fixed (byte* p = vkr.physicalDeviceDriverProperties.driverName)
+            vkDevice._deviceName = Encoding.UTF8.GetString(MemoryMarshal.CreateReadOnlySpanFromNullTerminated(p));
+        fixed (byte* p = vkr.physicalDeviceDriverProperties.driverInfo)
+            vkDevice._driverInfo = Encoding.UTF8.GetString(MemoryMarshal.CreateReadOnlySpanFromNullTerminated(p));
+
+        vkDevice._physicalDeviceProperties = vkr.physicalDeviceProperties.properties;
 
         VulkanNative.vkGetPhysicalDeviceFeatures(vkDevice._physicalDevice, out vkDevice._physicalDeviceFeatures);
         VulkanNative.vkGetPhysicalDeviceMemoryProperties(vkDevice._physicalDevice, out vkDevice._physicalDeviceMemProperties);

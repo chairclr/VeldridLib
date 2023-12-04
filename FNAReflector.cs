@@ -1,5 +1,6 @@
 using System;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework.Graphics;
 using VeldridLib.Backends;
@@ -12,11 +13,11 @@ internal class FNAReflector
 
     private static Veldrid.GraphicsDevice? VeldridGraphicsDevice;
 
-    private static unsafe FNA3DDevice* GetFNADevice(GraphicsDevice graphicsDevice)
+    private static unsafe ref FNA3DDevice GetFNADevice(GraphicsDevice graphicsDevice)
     {
         nint value = (nint)FNADeviceField.GetValue(graphicsDevice)!;
 
-        return (FNA3DDevice*)value;
+        return ref Unsafe.AsRef<FNA3DDevice>((void*)value);
     }
 
     public static unsafe Veldrid.GraphicsDevice GetGraphicsDevice(GraphicsDevice graphicsDevice)
@@ -26,23 +27,22 @@ internal class FNAReflector
             return VeldridGraphicsDevice;
         }
 
-        FNA3DDevice* fnaDevice = GetFNADevice(graphicsDevice);
-        Veldrid.GraphicsBackend backend = DetermineFNADriver(fnaDevice);
+        ref FNA3DDevice fnaDevice = ref GetFNADevice(graphicsDevice);
+        Veldrid.GraphicsBackend backend = DetermineFNADriver(ref fnaDevice);
 
         return backend switch
         {
-            Veldrid.GraphicsBackend.Vulkan => VeldridGraphicsDevice = VulkanDeviceHelper.MakeDevice(fnaDevice),
+            Veldrid.GraphicsBackend.Vulkan => VeldridGraphicsDevice = VulkanDeviceHelper.MakeDevice(ref fnaDevice),
             // OpenGL temporarily disabled due to issues
             // Veldrid.GraphicsBackend.OpenGL => VeldridGraphicsDevice = OepnGLDeviceHelper.MakeDevice(fnaDevice),
-            Veldrid.GraphicsBackend.Direct3D11 => VeldridGraphicsDevice = D3D11DeviceHelper.MakeDevice(fnaDevice),
+            Veldrid.GraphicsBackend.Direct3D11 => VeldridGraphicsDevice = D3D11DeviceHelper.MakeDevice(ref fnaDevice),
             _ => throw new Exception($"Unsupported FNA3D Driver '{backend}'"),
         };
     }
 
-    private static unsafe Veldrid.GraphicsBackend DetermineFNADriver(FNA3DDevice* fnaDevice)
+    private static unsafe Veldrid.GraphicsBackend DetermineFNADriver(ref FNA3DDevice fnaDevice)
     {
-        FNA3D_SysRendererEXT sysRenderer;
-        ((delegate*<FNA3DDevice*, FNA3D_SysRendererEXT*, void>)fnaDevice->GetSysRenderer)(fnaDevice, &sysRenderer);
+        ((delegate*<ref FNA3DDevice, out FNA3D_SysRendererEXT, void>)fnaDevice.GetSysRenderer)(ref fnaDevice, out FNA3D_SysRendererEXT sysRenderer);
 
         return sysRenderer.rendererType switch
         {

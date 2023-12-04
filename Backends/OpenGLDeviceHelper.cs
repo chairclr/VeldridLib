@@ -3,20 +3,21 @@ using System.Runtime.InteropServices;
 using Veldrid.OpenGL;
 using Terraria;
 using Veldrid;
+using System.Runtime.CompilerServices;
 
 namespace VeldridLib.Backends;
 
 internal class OepnGLDeviceHelper
 {
-    public unsafe static Veldrid.OpenGL.OpenGLGraphicsDevice MakeDevice(FNAReflector.FNA3DDevice* fnaDevice)
+    public unsafe static Veldrid.OpenGL.OpenGLGraphicsDevice MakeDevice(ref FNAReflector.FNA3DDevice fnaDevice)
     {
-        OpenGLRenderer* oglr = (OpenGLRenderer*)fnaDevice->driverData;
+        ref OpenGLRenderer oglr = ref Unsafe.As<byte, OpenGLRenderer>(ref Unsafe.AsRef<byte>((void*)fnaDevice.driverData));
 
         nint sdlHandle = Main.instance.Window.Handle;
-        nint context = oglr->context;
+        nint context = oglr.context;
 
         OpenGLPlatformInfo platformInfo = new OpenGLPlatformInfo(
-            oglr->context,
+            oglr.context,
             SDL2.SDL.SDL_GL_GetProcAddress,
             context => SDL2.SDL.SDL_GL_MakeCurrent(sdlHandle, context),
             SDL2.SDL.SDL_GL_GetCurrentContext,
