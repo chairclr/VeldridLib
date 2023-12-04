@@ -21,10 +21,23 @@
     </Reference>
     <Reference Include="vk">
       <HintPath>$(ProjectDir)lib/vk.dll</HintPath>
+    </Reference>    
+    <Reference Include="Vortice.Direct3D11">
+      <HintPath>$(ProjectDir)lib/Vortice.Direct3D11.dll</HintPath>
+    </Reference>
+    <Reference Include="Vortice.DirectX">
+      <HintPath>$(ProjectDir)lib/Vortice.DirectX.dll</HintPath>
+    </Reference>
+    <Reference Include="Vortice.DXGI">
+      <HintPath>$(ProjectDir)lib/Vortice.DXGI.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpGen.Runtime">
+      <HintPath>$(ProjectDir)lib/SharpGen.Runtime.dll</HintPath>
     </Reference>
   </ItemGroup>
 
   <ItemGroup>
     <Publicize Include="Veldrid" />
+    <Publicize Include="Vortice.Direct3D11" />
   </ItemGroup>
 </Project>
