@@ -1,11 +1,8 @@
 using System;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Text;
 using Microsoft.Xna.Framework.Graphics;
-using Terraria.ModLoader;
-using Vulkan;
+using VeldridLib.Backends;
 
 namespace VeldridLib;
 
@@ -35,7 +32,8 @@ internal class FNAReflector
         return backend switch
         {
             Veldrid.GraphicsBackend.Vulkan => VeldridGraphicsDevice = VulkanDeviceHelper.MakeDevice(fnaDevice),
-            Veldrid.GraphicsBackend.OpenGL => VeldridGraphicsDevice = OepnGLDeviceHelper.MakeDevice(fnaDevice),
+            // OpenGL temporarily disabled due to issues
+            // Veldrid.GraphicsBackend.OpenGL => VeldridGraphicsDevice = OepnGLDeviceHelper.MakeDevice(fnaDevice),
             Veldrid.GraphicsBackend.Direct3D11 => VeldridGraphicsDevice = D3D11DeviceHelper.MakeDevice(fnaDevice),
             _ => throw new Exception($"Unsupported FNA3D Driver '{backend}'"),
         };

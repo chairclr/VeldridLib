@@ -4,7 +4,7 @@ using Veldrid.OpenGL;
 using Terraria;
 using Veldrid;
 
-namespace VeldridLib;
+namespace VeldridLib.Backends;
 
 internal class OepnGLDeviceHelper
 {
@@ -29,6 +29,7 @@ internal class OepnGLDeviceHelper
         Veldrid.OpenGL.OpenGLGraphicsDevice glDevice = new Veldrid.OpenGL.OpenGLGraphicsDevice(new GraphicsDeviceOptions(false) { PreferDepthRangeZeroToOne = false, SyncToVerticalBlank = true }, platformInfo, 1, 1);
 
         // TODO: Steal swapchain and backbuffer from FNA3D
+        // TODO: FIX EVERYTHING??
         glDevice._mainSwapchain.Dispose();
         glDevice._swapchainFramebuffer.Dispose();
         glDevice._mainSwapchain = null;

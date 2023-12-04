@@ -8,7 +8,7 @@ using Vulkan;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
 
-namespace VeldridLib;
+namespace VeldridLib.Backends;
 
 internal class VulkanDeviceHelper
 {
